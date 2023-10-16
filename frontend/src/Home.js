@@ -7,6 +7,8 @@ import { useState } from 'react';
 import SongTable from './SongTable';
 import './Home.css';
 
+const backendURL = process.env.REACT_APP_BACKEND;
+
 function SubmitButton({ loading }) {
     if (loading) {
         return (
@@ -41,7 +43,7 @@ function Home({ spotifyUser, updateSpotifyUser }) {
         }
 
         setLoading(true);
-        fetch("http://localhost:5000/openai", {
+        fetch(backendURL + "/openai", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const client_id = '0d7a966720dc443bbe32df982b3cfb9a'; // This is not a secret, it will be passed in the URI to Spotify
-const redirect_uri = 'http://localhost:3000/callback';
+const frontendURL = process.env.REACT_APP_FRONTEND;
+const redirect_uri = frontendURL + '/callback';
 
 const logInMessage = 'Login to Spotify';
 const logOutMessage = 'Log out'

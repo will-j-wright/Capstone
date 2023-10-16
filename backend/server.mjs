@@ -16,7 +16,8 @@ dotenv.config();
 
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const redirect_uri = 'http://localhost:' + FE_PORT + '/callback';
+const frontendURL = process.env.REACT_APP_FRONTEND;
+const redirect_uri = frontendURL + '/callback';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -58,6 +59,7 @@ app.get('/spotify', function (req, res) {
             console.log("Error when exchanging auth code for token");
             if (error.response) {
                 res.status(error.response.status).send(error.response.data);
+                console.log(error.response.data);
             }
             else {
                 res.status(500).send({});

@@ -5,6 +5,8 @@ import { SpotifyToken } from "./App";
 const successMessage = 'Successfully loaded Spotify details';
 const failureMessage = 'Failed to load Spotify details';
 
+const backendURL = process.env.REACT_APP_BACKEND;
+
 function CallbackPage({ updateSpotifyUser }) {
     const [params] = useSearchParams();
 
@@ -18,7 +20,7 @@ function CallbackPage({ updateSpotifyUser }) {
             setLoadingMessage(failureMessage);
             return;
         }
-        fetch('http://localhost:5000/spotify?code=' + params.get('code'))
+        fetch(backendURL + '/spotify?code=' + params.get('code'))
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
