@@ -3,8 +3,13 @@ import AppNavbar from './AppNavbar';
 import CallbackPage from './CallbackPage';
 import { useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Home from './Home';
 
-class SpotifyToken {
+class SpotifyUser {
+  // TODO: Change these fields to match the Spotify API (just copy the JSON response)
+  name;
+  id;
+  iconUrl;
   constructor(token, expiresAt) {
     this.token = token;
     this.expiresAt = expiresAt;
@@ -17,24 +22,24 @@ class SpotifyToken {
 
 function App() {
 
-  const [spotifyToken, setSpotifyToken] = useState(null);
+  const [spotifyUser, setSpotifyUser] = useState(null);
 
-  const updateSpotifyToken = (token) => {
-    setSpotifyToken(token);
+  const updateSpotifyUser = (user) => {
+    setSpotifyUser(user);
   }
 
   return (
     <BrowserRouter>
       <div className="App">
-        <AppNavbar spotifyToken={spotifyToken} updateSpotifyToken={updateSpotifyToken} />
+        <AppNavbar spotifyUser={spotifyUser} updateSpotifyUser={updateSpotifyUser} />
         <Routes>
-          <Route path='/' element={<h1>Home</h1>} />
-          <Route path='/callback' element={<CallbackPage updateSpotifyToken={updateSpotifyToken} />} />
+          <Route path='/' element={<Home spotifyUser={spotifyUser} updateSpotifyUser={updateSpotifyUser} />} />
+          <Route path='/callback' element={<CallbackPage updateSpotifyUser={updateSpotifyUser} />} />
         </Routes>
       </div>
     </BrowserRouter>
   );
 }
 
-export { SpotifyToken };
+export { SpotifyUser as SpotifyToken };
 export default App;

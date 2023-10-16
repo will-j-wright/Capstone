@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { SpotifyToken } from "./App";
 
 const successMessage = 'Successfully loaded Spotify details';
 const failureMessage = 'Failed to load Spotify details';
 
-function CallbackPage({ updateSpotifyToken }) {
+function CallbackPage({ updateSpotifyUser }) {
     const [params] = useSearchParams();
 
     const [loadingMessage, setLoadingMessage] = useState('Loading Spotify details...');
@@ -23,11 +23,11 @@ function CallbackPage({ updateSpotifyToken }) {
             .then(data => {
                 if (data.error) {
                     setLoadingMessage(failureMessage);
-                    updateSpotifyToken(null);
+                    updateSpotifyUser(null);
                 }
                 else {
                     setLoadingMessage(successMessage);
-                    updateSpotifyToken(new SpotifyToken(data.access_token, Date.now() + data.expires_in * 1000));
+                    updateSpotifyUser(new SpotifyToken(data.access_token, Date.now() + data.expires_in * 1000));
                 }
             })
     }, []);

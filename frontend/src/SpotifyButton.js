@@ -3,6 +3,7 @@
 import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const client_id = '0d7a966720dc443bbe32df982b3cfb9a'; // This is not a secret, it will be passed in the URI to Spotify
 const redirect_uri = 'http://localhost:3000/callback';
@@ -13,7 +14,7 @@ const logOutMessage = 'Log out'
 // When the user clicks the button, redirect them to Spotify to log in
 // This will redirect them back to the callback page
 function spotifyLogin() {
-    var scope = 'user-read-private user-read-email';
+    var scope = 'user-read-private user-read-email playlist-modify-public playlist-modify-private';
 
     const params = new URLSearchParams({
         response_type: 'code',
@@ -25,33 +26,40 @@ function spotifyLogin() {
     window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
 }
 
-function spotifyLogout(updateSpotifyToken) {
+function spotifyLogout(updateSpotifyUser) {
     //TODO: Logout
 }
 
-function SpotifyButton({ spotifyToken, updateSpotifyToken }) {
+function SpotifyButton({ spotifyUser, updateSpotifyUser }) {
 
     const [photoURI, setPhotoURI] = useState(null);
+    const nav = useNavigate();
 
     useEffect(() => {
-        if (spotifyToken) {
+        if (spotifyUser) {
             fetch("https://api.spotify.com/v1/me", {
                 headers: {
-                    "Authorization": "Bearer " + spotifyToken.token
+                    "Authorization": "Bearer " + spotifyUser.token
                 }
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data && !data.error) {
                         setPhotoURI(data.images[0].url);
+                        var u = spotifyUser;
+                        u.name = data.display_name;
+                        u.id = data.id;
+                        u.photoURI = data.images[0].url;
+                        updateSpotifyUser(u);
+                        nav('/');
                     };
                 });
         }
-    }, [spotifyToken]);
+    }, [spotifyUser, updateSpotifyUser, nav]);
 
-    if (spotifyToken) {
+    if (spotifyUser) {
         return (
-            <Button variant="danger" onClick={() => spotifyLogout(updateSpotifyToken)}>
+            <Button variant="danger" onClick={() => spotifyLogout(updateSpotifyUser)}>
                 <Image src={photoURI} className="mr-2" roundedCircle width="30" height="30" style={{ marginRight: '10px' }} />
                 <span>{logOutMessage}</span>
             </Button>

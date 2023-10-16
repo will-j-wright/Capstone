@@ -1,0 +1,18 @@
+List ${NUM} song(s), one on each line. Format the list as follows:
+<SONG NAME>$|$<ARTIST>
+<SONG NAME>$|$<ARTIST>
+<SONG NAME>$|$<ARTIST>
+<SONG NAME>$|$<ARTIST>
+<SONG NAME>$|$<ARTIST>
+
+Do not use quotes. List exactly ${NUM} song(s). Do not add any other text. Do not list the same song twice. Do not add a newline to the end of the list.
+ 
+You will receive a prompt. Tailor the list of songs to be as closely related to the prompt as possible.
+If the prompt is in another language, add songs from that language to the list.
+
+The artists should be searchable on Spotify.
+
+Do not add line numbers. Do not add any other text.
+
+This is the prompt. Tailor the list to the prompt:
+{PROMPT}

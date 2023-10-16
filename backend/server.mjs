@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import axios from 'axios';
+import OpenAI from 'openai';
+import fs from 'fs';
 
 const PORT = process.env.PORT || 5000;
 const FE_PORT = 3000;
@@ -12,9 +14,15 @@ const app = express();
 // and SPOTIFY_CLIENT_SECRET
 dotenv.config();
 
-var client_id = process.env.SPOTIFY_CLIENT_ID;
-var client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-var redirect_uri = 'http://localhost:' + FE_PORT + '/callback';
+const client_id = process.env.SPOTIFY_CLIENT_ID;
+const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+const redirect_uri = 'http://localhost:' + FE_PORT + '/callback';
+
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+
+var promptTemplate = fs.readFileSync('prompt.txt', 'utf8');
 
 app.use(cors());
 app.use(express.json());
@@ -23,7 +31,6 @@ app.use(express.json());
 // This requires a secret so we do it on the backend
 app.get('/spotify', function (req, res) {
     const code = req.query.code;
-    console.log(code);
     if (!code) {
         res.status(400).send({});
         return;
@@ -45,11 +52,10 @@ app.get('/spotify', function (req, res) {
 
     axios.post('https://accounts.spotify.com/api/token', body, options)
         .then(function (response) {
-            console.log(response.data);
             res.send(response.data);
         })
         .catch(function (error) {
-            console.log(error);
+            console.log("Error when exchanging auth code for token");
             if (error.response) {
                 res.status(error.response.status).send(error.response.data);
             }
@@ -57,6 +63,38 @@ app.get('/spotify', function (req, res) {
                 res.status(500).send({});
             }
         });
+});
+
+async function queryOpenAI(userPrompt, numSongs) {
+    const prompt = promptTemplate.replace('{NUM}', numSongs).replace('{PROMPT}', userPrompt);
+    const chatCompletion = await openai.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'gpt-3.5-turbo',
+        n: 1,
+    });
+    if (chatCompletion.choices)
+        return chatCompletion.choices[0].message.content;
+    else
+        return "";
+}
+
+app.post('/openai', async function (req, res) {
+    const userPrompt = req.body.prompt;
+    const numSongs = req.body.numSongs;
+
+    if (!userPrompt || !numSongs) {
+        res.status(400).send({});
+        return;
+    }
+
+    var completion;
+    do {
+        console.log("Querying OpenAI");
+        completion = await queryOpenAI(userPrompt, numSongs);
+        console.log("Got response from OpenAI, " + completion.split('\n').length + " lines");
+    } while (!completion.includes("$|$") || completion.split('\n').length != numSongs); // Ensure the prompt follows our rules
+
+    res.send(completion.split('\n'));
 });
 
 app.listen(PORT, () => {
