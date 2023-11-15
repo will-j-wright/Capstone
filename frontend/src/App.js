@@ -1,9 +1,10 @@
 import './App.css';
 import AppNavbar from './AppNavbar';
 import CallbackPage from './CallbackPage';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './Home';
+import { useCookies } from 'react-cookie';
 
 class SpotifyUser {
   // TODO: Change these fields to match the Spotify API (just copy the JSON response)
@@ -23,6 +24,19 @@ class SpotifyUser {
 function App() {
 
   const [spotifyUser, setSpotifyUser] = useState(null);
+  const [cookie,] = useCookies(['spotifyUser']);
+
+  useEffect(() => {
+    if (cookie.spotifyUser) {
+      if (cookie.spotifyUser.expiresAt < Date.now()) {
+        setSpotifyUser(null);
+        cookie.remove('spotifyUser');
+      }
+      else {
+        setSpotifyUser(cookie.spotifyUser);
+      }
+    }
+  });
 
   const updateSpotifyUser = (user) => {
     setSpotifyUser(user);
