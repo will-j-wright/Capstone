@@ -4,6 +4,7 @@ import CallbackPage from './CallbackPage';
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Home from './Home';
+import History from './History';
 import { useCookies } from 'react-cookie';
 
 class SpotifyUser {
@@ -49,6 +50,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Home spotifyUser={spotifyUser} updateSpotifyUser={updateSpotifyUser} />} />
           <Route path='/callback' element={<CallbackPage updateSpotifyUser={updateSpotifyUser} />} />
+          <Route path='/history' element={<History spotifyUser={spotifyUser} />} />
         </Routes>
       </div>
     </BrowserRouter>

@@ -1,18 +1,14 @@
+import './load_env.mjs';
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import axios from 'axios';
 import OpenAI from 'openai';
 import fs from 'fs';
+import db from './db_conn.mjs';
 
 const PORT = process.env.PORT || 5000;
 const FE_PORT = 3000;
 const app = express();
-
-// Load environment variables from .env file
-// Requires environment variable SPOTIFY_CLIENT_ID
-// and SPOTIFY_CLIENT_SECRET
-dotenv.config();
 
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
@@ -67,11 +63,41 @@ app.get('/spotify', function (req, res) {
         });
 });
 
+app.get('/history', async (req, res) => {
+    const id = req.query.id;
+    if (!id) {
+        res.status(400).send({});
+        return;
+    }
+
+    // Get the user's history and sort it by most recent, then take the first 10
+    const coll = db.collection('histories');
+    const hist = await coll.find({ id: id }, { sort: { _id: -1 }, projection: { _id: 0 } }).limit(10).toArray();
+    res.send(hist);
+});
+
+app.post('/history', async (req, res) => {
+    const userID = req.body.id;
+    const name = req.body.name;
+    const songs = req.body.songs;
+    const date = new Date();
+
+    if (!name || !songs) {
+        res.status(400).send({});
+        return;
+    }
+
+    const hist = { id: userID, name: name, songs: songs, date: date };
+    db.collection('histories').insertOne(hist);
+
+    res.send({});
+});
+
 async function queryOpenAI(userPrompt, numSongs) {
     const prompt = promptTemplate.replace('{NUM}', numSongs).replace('{PROMPT}', userPrompt);
     const chatCompletion = await openai.chat.completions.create({
         messages: [{ role: 'user', content: prompt }],
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4',
         n: 1,
     });
     if (chatCompletion.choices)

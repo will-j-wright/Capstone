@@ -60,6 +60,19 @@ function Home({ spotifyUser, updateSpotifyUser }) {
                 setSongs(data);
                 setLoading(false);
                 setTableKey(tableKey + 1);
+
+                // Update the user's history
+                fetch(backendURL + "/history", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: spotifyUser.id,
+                        name: form.prompt.value,
+                        songs: data
+                    })
+                })
             });
     };
 
