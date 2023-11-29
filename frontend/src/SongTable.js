@@ -1,4 +1,5 @@
 import Button from "react-bootstrap/Button";
+import CloseButton from "react-bootstrap/CloseButton";
 import Table from "react-bootstrap/Table";
 import { useEffect, useState } from "react";
 
@@ -10,6 +11,7 @@ function SongTable({ songs, spotifyUser, prompt }) {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
     const [playlistLink, setPlaylistLink] = useState(null);
+    const [songList, setSongList] = useState(songs);
 
     function openPlaylistLink() {
         window.open(playlistLink, "_blank");
@@ -74,7 +76,7 @@ function SongTable({ songs, spotifyUser, prompt }) {
                 const playlistURL = data.external_urls.spotify;
                 const promises = [];
                 const songURIs = [];
-                for (const song of songs) {
+                for (const song of songList) {
                     const s = song.split('$|$');
                     const songName = s[0];
                     const artistName = s[1];
@@ -134,15 +136,19 @@ function SongTable({ songs, spotifyUser, prompt }) {
             });
     };
 
-    if (songs.length === 0) {
+    if (songList.length === 0) {
         return <></>;
     }
-    const songMap = songs.map((song, index) => {
+    const songMap = songList.map((song, index) => {
         const s = song.split('$|$');
         return (
             <tr key={index}>
                 <td>{s[0]}</td>
                 <td>{s[1]}</td>
+                <td><Button variant="danger" onClick={() => {
+                    const newSongList = songList.filter((_, i) => i !== index);
+                    setSongList(newSongList);
+                }}>Remove</Button></td>
             </tr>
         )
     });
