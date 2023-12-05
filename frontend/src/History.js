@@ -53,6 +53,7 @@ function History({ spotifyUser }) {
                                             <SongTable songs={e.songs} spotifyUser={spotifyUser} prompt={e.name} />
                                         </Card.Body>
                                     </Card>
+                                    <br />
                                 </Col>
                             )
                         })}
