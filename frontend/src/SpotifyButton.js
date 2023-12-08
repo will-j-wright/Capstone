@@ -28,14 +28,15 @@ function spotifyLogin() {
     window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
 }
 
-function spotifyLogout(updateSpotifyUser) {
-    //TODO: Logout
+function spotifyLogout(removeCookie) {
+    removeCookie('spotifyUser', { path: '/' });
+    window.location.href = '/';
 }
 
 function SpotifyButton({ spotifyUser, updateSpotifyUser }) {
 
     const [photoURI, setPhotoURI] = useState(null);
-    const [, setCookie] = useCookies(['spotifyUser']);
+    const [, setCookie, removeCookie] = useCookies(['spotifyUser']);
     const nav = useNavigate();
 
     useEffect(() => {
@@ -71,7 +72,7 @@ function SpotifyButton({ spotifyUser, updateSpotifyUser }) {
 
     if (spotifyUser) {
         return (
-            <Button variant="danger" onClick={() => spotifyLogout(updateSpotifyUser)}>
+            <Button variant="danger" onClick={() => spotifyLogout(removeCookie, nav)}>
                 <Image src={photoURI} className="mr-2" roundedCircle width="30" height="30" style={{ marginRight: '10px' }} />
                 <span>{logOutMessage}</span>
             </Button>
