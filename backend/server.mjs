@@ -72,7 +72,7 @@ app.get('/history', async (req, res) => {
 
     // Get the user's history and sort it by most recent, then take the first 10
     const coll = db.collection('histories');
-    const hist = await coll.find({ id: id }, { sort: { _id: -1 }, projection: { _id: 0 } }).limit(10).toArray();
+    const hist = await coll.find({ id: id }, { sort: { _id: -1 }, projection: { _id: 0 } }).limit(6).toArray();
     res.send(hist);
 });
 
